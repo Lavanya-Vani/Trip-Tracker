@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Travel Planner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            color: #fff;
+            background-color: #1a1a1a;
+        }
+
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.37);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .back-to-home-link {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            z-index: 10;
+        }
+        
+        .back-to-home-link a {
+            display: block;
+            padding: 8px 15px;
+            background-color: #2980b9;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        
+        .back-to-home-link a:hover {
+            background-color: #1a5276;
+        }
+        
+        .welcome-screen, .trip-details-screen, .trip-planner {
+            background-image: url('/static/things.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        
+        /* Welcome Screen Styles */
+        .welcome-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        
+        .welcome-title {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0);
+        }
+        
+        .welcome-form {
+            background-color: rgba(255, 255, 255, 0.128);
+           
+            border-radius: 10px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1.1rem;
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background-color: #0cbfbf;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #14919a;
+        }
+        
+        /* Trip Details Screen Styles */
+        .trip-details-screen {
+            display: none;
+        }
+        
+        /* Trip Planner Styles */
+        .trip-planner {
+            display: none;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.352);
+        }
+        
+        .destination {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.329);
+        }
+        
+        .lists-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex: 1;
+        }
+        
+        .list-card {
+            background-color: rgba(255, 255, 255, 0.078);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            width: 300px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .list-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .list-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #f2f8f6;
+            text-align: center;
+        }
+        
+        .list-card ul {
+            list-style-position: inside;
+            padding-left: 10px;
+        }
+        
+        .list-card li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .list-card input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+        
+        .list-card label {
+            flex: 1;
+        }
+        
+        .list-card input[type="checkbox"]:checked + label {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .add-item {
+            display: flex;
+            margin-top: 15px;
+        }
+        
+        .add-item input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+        
+        .add-item input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .add-item button {
+            padding: 8px 12px;
+            background-color: #e1635e;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            color: white;
+            cursor: pointer;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 20px auto 0;
+        }
+        
+        .btn-save, .btn-home {
+            padding: 10px 20px;
+            background-color: #e1635e;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-home {
+            background-color: #e1635e;
+        }
+        
+        .btn-save:hover {
+            background-color: #45a049;
+        }
+        
+        .btn-home:hover {
+            background-color: #45a049;
+        }
+        
+        .footer-text {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .saved-trips {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 0 auto;
+            max-width: 800px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+        
+        .saved-trips h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .trips-list {
+            list-style: none;
+        }
+        
+        .trip-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .trip-item:last-child {
+            border-bottom: none;
+        }
+        
+        .trip-item-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .trip-item button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .btn-load {
+            background-color: #2196F3;
+        }
+        
+        .btn-delete {
+            background-color: #e1635e;
+        }
+        
+        .btn-load:hover {
+            background-color: #0b7dda;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c74340;
+        }
+        
+        .delete-confirm {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            display: none;
+        }
+        
+        .delete-confirm-box {
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .delete-confirm-box h3 {
+            margin-bottom: 15px;
+        }
+        
+        .delete-confirm-box p {
+            margin-bottom: 20px;
+        }
+        
+        .delete-confirm-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .list-card {
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Screen - First step: Ask for trip name -->
+    <div class="welcome-screen" id="welcome-screen">
+        <div class="overlay">
+            <div class="back-to-home-link">
+                <a href="{{url_for('home')}}">Back to Home</a>
+            </div>
+            <div class="welcome-container">
+                <h1 class="welcome-title">Travel Planner</h1>
+                <div class="welcome-form">
+                    <div class="form-group">
+                        <label for="trip-name">What's the name of your trip?</label>
+                        <input type="text" id="trip-name" placeholder="e.g., Summer Vacation 2025" required>
+                    </div>
+                    <button class="btn" onclick="goToDetailsPage()">Continue</button>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <button class="btn" onclick="showSavedTrips()" style="background-color: #2196F3;">View Saved Trips</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="saved-trips" id="saved-trips">
+                <h2>Your Saved Trips</h2>
+                <ul class="trips-list" id="trips-list">
+                    <!-- Saved trips will be displayed here -->
+                </ul>
+                <button class="btn" onclick="hideSavedTrips()" style="margin-top: 15px; background-color: #2196F3;">Back</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Trip Details Screen - Second step: Ask for destination -->
+    <div class="trip-details-screen" id="trip-details-screen">
+        <div class="overlay">
+            <div class="welcome-container">
+                <h1 class="welcome-title" id="details-title">Trip Details</h1>
+                <div class="welcome-form">
+                    <div class="form-group">
+                        <label for="trip-destination">Where are you going?</label>
+                        <input type="text" id="trip-destination" placeholder="e.g., Paris, France" required>
+                    </div>
+                    <button class="btn" onclick="startPlanning()">Start Planning</button>
+                    <button class="btn" onclick="goToHome()" style="margin-top: 10px; background-color: #2196F3;">Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Trip Planner Screen - Third step: Planning details -->
+    <div class="trip-planner" id="trip-planner">
+        <div class="overlay">
+            <header>
+                <h1 id="planner-title">My Travel Essentials</h1>
+                <div class="destination" id="planner-destination">Your Destination</div>
+            </header>
+            
+            <div class="lists-container">
+                <div class="list-card">
+                    <h2>Things to Pack</h2>
+                    <ul id="pack-list">
+                        <li>
+                            <input type="checkbox" id="pack1">
+                            <label for="pack1">Passport & ID</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="pack2">
+                            <label for="pack2">Phone charger</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="pack3">
+                            <label for="pack3">Travel adapter</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="pack4">
+                            <label for="pack4">Headphones</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="pack5">
+                            <label for="pack5">Medications</label>
+                        </li>
+                    </ul>
+                    <div class="add-item">
+                        <input type="text" id="pack-input" placeholder="Add new item...">
+                        <button onclick="addItem('pack')">+</button>
+                    </div>
+                </div>
+                
+                <div class="list-card">
+                    <h2>Things to Buy There</h2>
+                    <ul id="buy-list">
+                        <li>
+                            <input type="checkbox" id="buy1">
+                            <label for="buy1">Local Handicrafts</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="buy2">
+                            <label for="buy2">Souvenirs</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="buy3">
+                            <label for="buy3">Local foods</label>
+                        </li>
+                    </ul>
+                    <div class="add-item">
+                        <input type="text" id="buy-input" placeholder="Add new item...">
+                        <button onclick="addItem('buy')">+</button>
+                    </div>
+                </div>
+                
+                <div class="list-card">
+                    <h2>Things to Do</h2>
+                    <ul id="do-list">
+                        <li>
+                            <input type="checkbox" id="do1">
+                            <label for="do1">Visit local landmarks</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="do2">
+                            <label for="do2">Try local cuisine</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="do3">
+                            <label for="do3">Take photos</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="do4">
+                            <label for="do4">Meet locals</label>
+                        </li>
+                    </ul>
+                    <div class="add-item">
+                        <input type="text" id="do-input" placeholder="Add new item...">
+                        <button onclick="addItem('do')">+</button>
+                    </div>
+                </div>
+            </div>
+            
+            <footer>
+                <button class="btn-home" onclick="goToHome()">Home</button>
+                <div class="footer-text">Click on destination to edit</div>
+                <button class="btn-save" onclick="saveTrip()">Save Trip</button>
+            </footer>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="delete-confirm" id="delete-confirm">
+        <div class="delete-confirm-box">
+            <h3>Delete Trip</h3>
+            <p id="delete-confirm-message">Are you sure you want to delete this trip?</p>
+            <div class="delete-confirm-buttons">
+                <button class="btn" onclick="cancelDelete()" style="background-color: #757575;">Cancel</button>
+                <button class="btn" onclick="confirmDelete()" style="background-color: #e1635e;">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data structure for saved trips
+        let savedTrips = JSON.parse(localStorage.getItem('savedTrips')) || [];
+        let currentTripId = null; // Changed to null by default
+        let currentTripName = '';
+        let tripToDelete = null;
+
+        // Default lists for a new trip
+        const defaultPackItems = [
+            { text: "Passport & ID", checked: false },
+            { text: "Phone charger", checked: false },
+            { text: "Travel adapter", checked: false },
+            { text: "Headphones", checked: false },
+            { text: "Medications", checked: false }
+        ];
+        
+        const defaultBuyItems = [
+            { text: "Local Handicrafts", checked: false },
+            { text: "Souvenirs", checked: false },
+            { text: "Local foods", checked: false }
+        ];
+        
+        const defaultDoItems = [
+            { text: "Visit local landmarks", checked: false },
+            { text: "Try local cuisine", checked: false },
+            { text: "Take photos", checked: false },
+            { text: "Meet locals", checked: false }
+        ];
+
+        // Function to go to details page after entering trip name
+        function goToDetailsPage() {
+            const tripName = document.getElementById('trip-name').value.trim();
+            
+            if (tripName) {
+                currentTripName = tripName;
+                document.getElementById('details-title').textContent = `${tripName} - Details`;
+                document.getElementById('welcome-screen').style.display = 'none';
+                document.getElementById('trip-details-screen').style.display = 'block';
+            } else {
+                alert('Please enter a trip name.');
+            }
+        }
+
+        // Function to start planning a new trip
+        function startPlanning() {
+            const tripDestination = document.getElementById('trip-destination').value.trim();
+            
+            if (tripDestination) {
+                document.getElementById('planner-title').textContent = currentTripName;
+                document.getElementById('planner-destination').textContent = tripDestination;
+                
+                document.getElementById('trip-details-screen').style.display = 'none';
+                document.getElementById('trip-planner').style.display = 'block';
+                
+                // Create a new trip ID
+                currentTripId = Date.now().toString();
+                
+                // Reset to default items for new trips
+                resetToDefaultItems();
+            } else {
+                alert('Please enter a destination.');
+            }
+        }
+
+        // Function to reset all lists to default items
+        function resetToDefaultItems() {
+            populateList('pack-list', defaultPackItems);
+            populateList('buy-list', defaultBuyItems);
+            populateList('do-list', defaultDoItems);
+        }
+
+        // Function to go back to home screen
+        function goToHome() {
+            document.getElementById('welcome-screen').style.display = 'block';
+            document.getElementById('trip-details-screen').style.display = 'none';
+            document.getElementById('trip-planner').style.display = 'none';
+            document.getElementById('saved-trips').style.display = 'none';
+            document.getElementById('trip-name').value = '';
+            document.getElementById('trip-destination').value = '';
+            document.querySelector('.welcome-form').style.display = 'block';
+            
+            // Reset current trip ID
+            currentTripId = null;
+        }
+
+        // Function to add new item to a list
+        function addItem(listType) {
+            const input = document.getElementById(`${listType}-input`);
+            const value = input.value.trim();
+            
+            if (value) {
+                const list = document.getElementById(`${listType}-list`);
+                const items = list.getElementsByTagName('li');
+                const newId = `${listType}${items.length + 1}`;
+                
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <input type="checkbox" id="${newId}">
+                    <label for="${newId}">${value}</label>
+                `;
+                
+                list.appendChild(li);
+                input.value = '';
+            }
+        }
+
+        // Function to save the current trip
+        function saveTrip() {
+            const tripName = document.getElementById('planner-title').textContent;
+            const tripDestination = document.getElementById('planner-destination').textContent;
+            
+            // Get all items from the lists
+            const packItems = getListItems('pack-list');
+            const buyItems = getListItems('buy-list');
+            const doItems = getListItems('do-list');
+            
+            const tripData = {
+                id: currentTripId,
+                name: tripName,
+                destination: tripDestination,
+                packItems: packItems,
+                buyItems: buyItems,
+                doItems: doItems,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Check if this trip already exists
+            const existingTripIndex = savedTrips.findIndex(trip => trip.id === currentTripId);
+            
+            if (existingTripIndex !== -1) {
+                // Update existing trip
+                savedTrips[existingTripIndex] = tripData;
+            } else {
+                // Add new trip
+                savedTrips.push(tripData);
+            }
+            
+            // Save to local storage
+            localStorage.setItem('savedTrips', JSON.stringify(savedTrips));
+            
+            alert('Trip saved successfully!');
+            
+            // Return to home screen after saving
+            goToHome();
+        }
+
+        // Function to get items from a list
+        function getListItems(listId) {
+            const list = document.getElementById(listId);
+            const items = list.getElementsByTagName('li');
+            const result = [];
+            
+            for (let i = 0; i < items.length; i++) {
+                const checkbox = items[i].querySelector('input[type="checkbox"]');
+                const label = items[i].querySelector('label');
+                
+                result.push({
+                    text: label.textContent,
+                    checked: checkbox.checked
+                });
+            }
+            
+            return result;
+        }
+
+        // Function to show saved trips
+        function showSavedTrips() {
+            const tripsList = document.getElementById('trips-list');
+            tripsList.innerHTML = '';
+            
+            if (savedTrips.length === 0) {
+                tripsList.innerHTML = '<li class="trip-item">No saved trips found.</li>';
+            } else {
+                savedTrips.forEach(trip => {
+                    const li = document.createElement('li');
+                    li.className = 'trip-item';
+                    li.innerHTML = `
+                        <span>${trip.name} to ${trip.destination}</span>
+                        <div class="trip-item-buttons">
+                            <button class="btn-load" onclick="loadTrip('${trip.id}')">Load</button>
+                            <button class="btn-delete" onclick="promptDeleteTrip('${trip.id}')">Delete</button>
+                        </div>
+                    `;
+                    tripsList.appendChild(li);
+                });
+            }
+            
+            document.getElementById('saved-trips').style.display = 'block';
+            document.querySelector('.welcome-form').style.display = 'none';
+        }
+
+        // Function to hide saved trips
+        function hideSavedTrips() {
+            document.getElementById('saved-trips').style.display = 'none';
+            document.querySelector('.welcome-form').style.display = 'block';
+        }
+
+        // Function to load a saved trip
+        function loadTrip(tripId) {
+            const trip = savedTrips.find(t => t.id === tripId);
+            
+            if (trip) {
+                // Set current trip ID
+                currentTripId = trip.id;
+                
+                // Update title and destination
+                document.getElementById('planner-title').textContent = trip.name;
+                document.getElementById('planner-destination').textContent = trip.destination;
+                
+                // Load pack items
+                populateList('pack-list', trip.packItems);
+                
+                // Load buy items
+                populateList('buy-list', trip.buyItems);
+                
+                // Load do items
+                populateList('do-list', trip.doItems);
+                
+                // Show the trip planner
+                document.getElementById('welcome-screen').style.display = 'none';
+                document.getElementById('trip-details-screen').style.display = 'none';
+                document.getElementById('trip-planner').style.display = 'block';
+            }
+        }
+
+        // Function to prompt for trip deletion
+        function promptDeleteTrip(tripId) {
+            tripToDelete = tripId;
+            const trip = savedTrips.find(t => t.id === tripId);
+            
+            if (trip) {
+                document.getElementById('delete-confirm-message').textContent = 
+                    `Are you sure you want to delete "${trip.name} to ${trip.destination}"?`;
+                document.getElementById('delete-confirm').style.display = 'flex';
+            }
+        }
+
+        // Function to cancel trip deletion
+        function cancelDelete() {
+            tripToDelete = null;
+            document.getElementById('delete-confirm').style.display = 'none';
+        }
+
+        // Function to confirm trip deletion
+        function confirmDelete() {
+            if (tripToDelete) {
+                // Remove the trip from the array
+                savedTrips = savedTrips.filter(trip => trip.id !== tripToDelete);
+                
+                // Save the updated trips to local storage
+                localStorage.setItem('savedTrips', JSON.stringify(savedTrips));
+                
+                // If we're deleting the current trip, clear the current trip ID
+                if (tripToDelete === currentTripId) {
+                    currentTripId = null;
+                }
+                
+                // Close the confirmation modal
+                document.getElementById('delete-confirm').style.display = 'none';
+                
+                // Refresh the saved trips list
+                showSavedTrips();
+                
+                // Clear the trip to delete
+                tripToDelete = null;
+            }
+        }
+
+        // Function to populate a list with items
+        function populateList(listId, items) {
+            const list = document.getElementById(listId);
+            list.innerHTML = '';
+            
+            items.forEach((item, index) => {
+                const listType = listId.split('-')[0];
+                const id = `${listType}${index + 1}`;
+                
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <input type="checkbox" id="${id}" ${item.checked ? 'checked' : ''}>
+                    <label for="${id}">${item.text}</label>
+                `;
+                
+                list.appendChild(li);
+            });
+        }
+
+        // Allow adding items by pressing Enter
+        document.querySelectorAll('.add-item input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const listType = this.id.split('-')[0];
+                    addItem(listType);
+                }
+            });
+        });
+
+        // Show saved trips automatically when the page loads if there are any
+        window.addEventListener('load', function() {
+            if (savedTrips.length > 0) {
+                setTimeout(showSavedTrips, 100);
+            }
+        });
+    </script>
+</body>
+</html>

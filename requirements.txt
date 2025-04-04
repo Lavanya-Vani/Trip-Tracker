@@ -1,0 +1,8 @@
+flask
+mysql-connector-python
+bcrypt
+python-dotenv
+langchain-openai
+openai
+pytest
+pytest-flask

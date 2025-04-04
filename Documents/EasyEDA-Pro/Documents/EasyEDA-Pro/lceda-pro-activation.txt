@@ -1,0 +1,8 @@
+{
+    "username": "jyothi9krithi",
+    "customer_code": "7445135A",
+    "email": "jyothi9krithi@gmail.com",
+    "phone": "",
+    "company": "",
+    "license": "dXNlcm5hbWV8Y3VzdG9tZXJfY29kZXxlbWFpbHxwaG9uZXxjb21wYW55,AHGsLGMWRlsEW1Kuj0kc0KS6\/Q+8j6CVCJX0V3RzNoC2VHzUw0urDbBsiG2\/KvS1v1RfLGSBD3ciif3zsHaZLrXl5oZww0LQE7lWAYtpq333kpPUcrjMoKsbNVCvajfQHacZKRYnze9lmGnEfviaHq8G28Y3Q7bI43Q3rVq6eww="
+}

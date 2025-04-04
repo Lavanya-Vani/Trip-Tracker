@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cozy Travel Journal</title>
+    <style>
+        :root {
+            --primary: #8ecae6;
+            --secondary: #caf0f8;
+            --accent: #70b7d8;
+            --light: #f0f8ff;
+            --dark: #2c3e50;
+            --shadow: rgba(44, 62, 80, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            background-image: url('/api/placeholder/1920/1080');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .back-to-home-link {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            z-index: 10;
+        }
+        
+        .back-to-home-link a {
+            display: block;
+            padding: 8px 15px;
+            background-color: #2980b9;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        
+        .back-to-home-link a:hover {
+            background-color: #1a5276;
+        }
+        
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 25px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px var(--shadow);
+            border: 2px dashed var(--primary);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--primary);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px var(--shadow);
+            position: relative;
+        }
+        
+        .header:before {
+            content: "✈";
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+        }
+        
+        .header:after {
+            content: "🌴";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+        }
+        
+        h1 {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            font-size: 2.5rem;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            background-color: var(--secondary);
+            color: var(--dark);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px var(--shadow);
+            border: 2px solid transparent;
+        }
+        
+        .nav-btn:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .nav-btn.active {
+            background-color: var(--accent);
+            color: white;
+            border: 2px dashed white;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            font-size: 1rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 10px rgba(112, 183, 216, 0.3);
+        }
+        
+        textarea {
+            min-height: 180px;
+            resize: vertical;
+        }
+        
+        .button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(112, 183, 216, 0.4);
+            display: inline-block;
+        }
+        
+        .button:hover {
+            background-color: #4a97c5;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(112, 183, 216, 0.5);
+        }
+        
+        .form-emoji {
+            position: absolute;
+            right: 15px;
+            top: 40px;
+            font-size: 1.5rem;
+        }
+        
+        .trip-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .trip-card {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid var(--secondary);
+            position: relative;
+        }
+        
+        .trip-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px var(--shadow);
+        }
+        
+        .trip-card:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+        }
+        
+        .trip-header {
+            background-color: var(--secondary);
+            padding: 20px;
+            position: relative;
+        }
+        
+        .trip-header h3 {
+            color: var(--dark);
+            margin-right: 30px;
+            font-size: 1.3rem;
+        }
+        
+        .trip-header .dates {
+            font-size: 0.9rem;
+            color: #4a6580;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .trip-header .dates:before {
+            content: "🗓";
+            margin-right: 5px;
+        }
+        
+        .btn-group {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .edit-btn, .delete-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .edit-btn {
+            background-color: #5dade2;
+        }
+        
+        .delete-btn {
+            background-color: #e74c3c;
+        }
+        
+        .edit-btn:hover, .delete-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .trip-content {
+            padding: 20px;
+        }
+        
+        .location {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .location:before {
+            content: "📍";
+            margin-right: 8px;
+        }
+        
+        .experience {
+            line-height: 1.7;
+            color: var(--dark);
+        }
+        
+        .no-trips {
+            text-align: center;
+            padding: 50px 0;
+            color: #5d7a99;
+            font-style: italic;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            border: 2px dashed var(--primary);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: var(--light);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            border: 3px solid var(--primary);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        
+        .edit-form h2 {
+            color: var(--accent);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .cute-decoration {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            bottom: -15px;
+            left: 0;
+            font-size: 1.5rem;
+            letter-spacing: 10px;
+            color: var(--primary);
+            opacity: 0.6;
+        }
+        
+        .mood {
+            margin-bottom: 12px;
+            color: #4a6580;
+        }
+        
+        @media (max-width: 768px) {
+            .trip-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .header:before, .header:after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>My Travel Journal</h1>
+        </div>
+        
+        <div class="nav">
+            <button class="nav-btn active" data-page="add">Add New Journey</button>
+            <button class="nav-btn" data-page="view">View My Journeys</button>
+            <div class="back-to-home-link">
+                <a href="{{url_for('home')}}">Back to Home</a>
+            </div>
+            
+        </div>
+        
+        <div id="addPage" class="page active">
+            <form id="tripForm">
+                <div class="form-group">
+                    <label for="tripTitle">Journey Title</label>
+                    <input type="text" id="tripTitle" placeholder="e.g., Summer Adventure in Bali" required>
+                    <span class="form-emoji">✨</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="location">Destination</label>
+                    <input type="text" id="location" placeholder="e.g., Bali, Indonesia" required>
+                    <span class="form-emoji">🌍</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="startDate">Journey Started</label>
+                    <input type="date" id="startDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="endDate">Journey Ended</label>
+                    <input type="date" id="endDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="mood">Mood of the Trip</label>
+                    <select id="mood" required>
+                        <option value="">Select your mood</option>
+                        <option value="Excited">Excited 😁</option>
+                        <option value="Relaxed">Relaxed 😌</option>
+                        <option value="Adventure">Adventurous 🤠</option>
+                        <option value="Romantic">Romantic 🥰</option>
+                        <option value="Mixed">Mixed Feelings 😅</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="experience">My Journey Story</label>
+                    <textarea id="experience" placeholder="Write about your wonderful journey here..." required></textarea>
+                </div>
+                
+                <button type="submit" class="button">✨ Save My Journey</button>
+            </form>
+            <div class="cute-decoration">• • • ♡ • • •</div>
+        </div>
+        
+        <div id="viewPage" class="page">
+            <div id="tripList" class="trip-list">
+                <!-- Trip entries will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="edit-form">
+                <h2>✨ Edit Your Journey ✨</h2>
+                <form id="editForm">
+                    <input type="hidden" id="editId">
+                    
+                    <div class="form-group">
+                        <label for="editTitle">Journey Title</label>
+                        <input type="text" id="editTitle" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editLocation">Destination</label>
+                        <input type="text" id="editLocation" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editStartDate">Journey Started</label>
+                        <input type="date" id="editStartDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editEndDate">Journey Ended</label>
+                        <input type="date" id="editEndDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editMood">Mood of the Trip</label>
+                        <select id="editMood" required>
+                            <option value="">Select your mood</option>
+                            <option value="Excited">Excited 😁</option>
+                            <option value="Relaxed">Relaxed 😌</option>
+                            <option value="Adventure">Adventurous 🤠</option>
+                            <option value="Romantic">Romantic 🥰</option>
+                            <option value="Mixed">Mixed Feelings 😅</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editExperience">My Journey Story</label>
+                        <textarea id="editExperience" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="button">💙 Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Page navigation
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const pages = document.querySelectorAll('.page');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const pageId = this.getAttribute('data-page');
+                    
+                    // Update active button
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show active page
+                    pages.forEach(page => page.classList.remove('active'));
+                    if (pageId === 'add') {
+                        document.getElementById('addPage').classList.add('active');
+                    } else {
+                        document.getElementById('viewPage').classList.add('active');
+                        loadTrips(); // Refresh trips when viewing
+                    }
+                });
+            });
+            
+            // Load trips initially
+            loadTrips();
+            
+            // Add trip form submission
+            document.getElementById('tripForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const tripTitle = document.getElementById('tripTitle').value;
+                const location = document.getElementById('location').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const mood = document.getElementById('mood').value;
+                const experience = document.getElementById('experience').value;
+                
+                // Create new trip object
+                const trip = {
+                    id: Date.now(),
+                    title: tripTitle,
+                    location: location,
+                    startDate: startDate,
+                    endDate: endDate,
+                    mood: mood,
+                    experience: experience,
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Save trip
+                saveTrip(trip);
+                
+                // Show success message
+                alert('Your journey has been saved successfully! ✨');
+                
+                // Reset form
+                this.reset();
+                
+                // Switch to view page
+                document.querySelector('.nav-btn[data-page="view"]').click();
+            });
+            
+            // Edit form submission
+            document.getElementById('editForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const tripId = parseInt(document.getElementById('editId').value);
+                const trips = getTripsFromStorage();
+                const tripIndex = trips.findIndex(trip => trip.id === tripId);
+                
+                if (tripIndex !== -1) {
+                    trips[tripIndex] = {
+                        ...trips[tripIndex],
+                        title: document.getElementById('editTitle').value,
+                        location: document.getElementById('editLocation').value,
+                        startDate: document.getElementById('editStartDate').value,
+                        endDate: document.getElementById('editEndDate').value,
+                        mood: document.getElementById('editMood').value,
+                        experience: document.getElementById('editExperience').value,
+                    };
+                    
+                    localStorage.setItem('trips', JSON.stringify(trips));
+                    closeModal();
+                    loadTrips();
+                    alert('Your journey has been updated! 💙');
+                }
+            });
+            
+            // Delete trip event delegation
+            document.getElementById('tripList').addEventListener('click', function(e) {
+                if (e.target.classList.contains('delete-btn')) {
+                    if (confirm('Are you sure you want to delete this precious memory?')) {
+                        const tripId = parseInt(e.target.getAttribute('data-id'));
+                        deleteTrip(tripId);
+                    }
+                } else if (e.target.classList.contains('edit-btn')) {
+                    const tripId = parseInt(e.target.getAttribute('data-id'));
+                    openEditModal(tripId);
+                }
+            });
+            
+            // Modal close button
+            document.querySelector('.close-modal').addEventListener('click', closeModal);
+        });
+        
+        // Save trip to localStorage
+        function saveTrip(trip) {
+            const trips = getTripsFromStorage();
+            trips.push(trip);
+            localStorage.setItem('trips', JSON.stringify(trips));
+        }
+        
+        // Get trips from localStorage
+        function getTripsFromStorage() {
+            const trips = localStorage.getItem('trips');
+            return trips ? JSON.parse(trips) : [];
+        }
+        
+        // Delete trip from localStorage
+        function deleteTrip(tripId) {
+            let trips = getTripsFromStorage();
+            trips = trips.filter(trip => trip.id !== tripId);
+            localStorage.setItem('trips', JSON.stringify(trips));
+            loadTrips();
+        }
+        
+        // Open edit modal and populate with trip data
+        function openEditModal(tripId) {
+            const trips = getTripsFromStorage();
+            const trip = trips.find(trip => trip.id === tripId);
+            
+            if (trip) {
+                document.getElementById('editId').value = trip.id;
+                document.getElementById('editTitle').value = trip.title;
+                document.getElementById('editLocation').value = trip.location;
+                document.getElementById('editStartDate').value = trip.startDate;
+                document.getElementById('editEndDate').value = trip.endDate;
+                document.getElementById('editMood').value = trip.mood || '';
+                document.getElementById('editExperience').value = trip.experience;
+                
+                document.getElementById('editModal').classList.add('active');
+            }
+        }
+        
+        // Close modal
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+        
+        // Load and display trips
+        function loadTrips() {
+            const tripList = document.getElementById('tripList');
+            const trips = getTripsFromStorage();
+            
+            // Clear current list
+            tripList.innerHTML = '';
+            
+            if (trips.length === 0) {
+                tripList.innerHTML = '<div class="no-trips">No journeys added yet. Start by adding your first magical adventure! ✈</div>';
+                return;
+            }
+            
+            // Sort trips by creation date (newest first)
+            trips.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            // Create trip cards
+            trips.forEach(trip => {
+                const tripCard = document.createElement('div');
+                tripCard.className = 'trip-card';
+                
+                // Format dates
+                const startDate = new Date(trip.startDate).toLocaleDateString();
+                const endDate = new Date(trip.endDate).toLocaleDateString();
+                
+                // Get mood emoji
+                let moodEmoji = '';
+                switch(trip.mood) {
+                    case 'Excited': moodEmoji = '😁'; break;
+                    case 'Relaxed': moodEmoji = '😌'; break;
+                    case 'Adventure': moodEmoji = '🤠'; break;
+                    case 'Romantic': moodEmoji = '🥰'; break;
+                    case 'Mixed': moodEmoji = '😅'; break;
+                    default: moodEmoji = '✨';
+                }
+                
+                tripCard.innerHTML = `
+                    <div class="trip-header">
+                        <h3>${trip.title}</h3>
+                        <div class="dates">${startDate} - ${endDate}</div>
+                        <div class="btn-group">
+                            <button class="edit-btn" data-id="${trip.id}">✏</button>
+                            <button class="delete-btn" data-id="${trip.id}">🗑</button>
+                        </div>
+                    </div>
+                    <div class="trip-content">
+                        <div class="location">${trip.location}</div>
+                        ${trip.mood ? <div class="mood"><strong>Mood:</strong> ${trip.mood} ${moodEmoji}</div> : ''}
+                        <div class="experience">${trip.experience}</div>
+                    </div>
+                `;
+                tripList.appendChild(tripCard);
+            });
+        }
+    </script>
+</body>
+</html>
