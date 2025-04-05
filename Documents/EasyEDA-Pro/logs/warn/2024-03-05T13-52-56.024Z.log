@@ -1,2 +1,0 @@
-[2024-03-05T13:52:58.624Z] [ERROR] [INJ-HTTP] [X-LC-ID-FB3wOO7geEK+AA==] {"errno":-4077,"code":"ECONNRESET","syscall":"read"}
-[2024-03-05T13:56:34.217Z] [ERROR] [SERVER] [X-LC-ID-5Zyxbe7geEKbAA==] json api {}
